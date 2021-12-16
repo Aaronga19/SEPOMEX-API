@@ -1,12 +1,14 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask.helpers import flash
 import flask_login
-from sqlalchemy.engine import url
+
 from sepomex.__init__ import app, db
 from sepomex.models import User
 from sepomex.forms import RegisterForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
 from sepomex.json_read import states, load_json
+
+from sepomex.sepomexextractinfo import data
 
 
 @app.route('/')
@@ -15,12 +17,24 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/api.sepomex/', methods=['GET'])
+@app.route('/api/welcome', methods=['GET'])
 @login_required
-def get_info():
-        path = f'sepomex/json/Aguascalientes.json'
-        response = load_json(path)
-        return jsonify(response)
+def api_welcome():
+        
+        return jsonify({'message':'Bienvenido a la API'})
+
+@app.route('/api/sepomex/<state>', methods=['GET'])
+@login_required
+def get_info(state: str):
+
+        # Extraer información desde el DataFrame de pandas
+        response = data[state].to_json()
+        response
+        # Para leer información desde los archivos json que fueron extraido por script
+        # path = f'sepomex/json/{state}.json'
+        # response = load_json(path)
+        return response
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -35,13 +49,13 @@ def register():
         db.session.commit()
 
         login_user(user_to_create)
-        flash(f'Account created successfully! You are now logged in as: {user_to_create.username.capitalize()}', category='success')
+        flash(f'Cuenta creada con éxito! Has iniciado sesión como: {user_to_create.username.capitalize()}', category='success')
 
-        return redirect(url_for('get_info'))
+        return redirect(url_for('api_welcome'))
     
     if form.errors != {}: # Si hay errores de validación
         for err_msg in form.errors.values():
-            flash(f'There was an error with creating a user {err_msg}', category='danger')
+            flash(f'Hubo un error al crear el usuario:--{err_msg}', category='danger')
 
     return render_template('users/register.html',form=form)
 
@@ -56,7 +70,7 @@ def login():
         if attempted_user and attempted_user.check_password_correction(attempted_password=form.password.data):
             login_user(attempted_user)
             flash(f'Enhorabuena! Has iniciado en la sesión: {attempted_user.username.capitalize()}', category='success')
-            return redirect(url_for('get_info'))
+            return redirect(url_for('api_welcome'))
 
         else:
             flash('Usuario y contraseña no coinciden, Favor de intentar nuevamente.', category='danger')
@@ -66,5 +80,5 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    flash('You have logged out!', category='info')
+    flash('Has salido de tu sesión', category='info')
     return redirect(url_for('home'))

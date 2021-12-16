@@ -9,6 +9,18 @@
     <title>Regristro</title>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            
+                <div class="alert alert-{{ category }} container col-4 mt-2" role="alert">
+                    <b>{{ message.capitalize() }}</b>
+                    <button type="button" class="btn-close float-end" data-bs-dismiss='alert' aria-label="Close"></button>
+                </div>
+            {% endfor %}    
+        {% endif %}        
+    {% endwith %}
+
     <h1 style="text-align: center;">Regístrate</h1>
 
     <div class="container text-center">

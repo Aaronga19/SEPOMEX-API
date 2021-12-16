@@ -1,8 +1,12 @@
-# import pandas as pd
+import pandas as pd
 
-# df = pd.read_excel('sepomex/sepomexdata.xls', sheet_name=['Distrito_Federal'])
+# leer el excel con pandas 
+data = pd.read_excel('sepomex/sepomexdata.xls', sheet_name=None, usecols='A:C', names=['codigo_postal', 'asentamiento', 'tipo'])
 
-# df.to_json(path_or_buf='Distrito_Federal.json', orient='records')
-import excel2json
+# print(data['Distrito_Federal'].to_json())
 
-excel2json.convert_from_file('sepomex/sepomexdata.xls')
+
+# Extraer cada hoja en un archivo json por separado
+"""import excel2json
+
+excel2json.convert_from_file('sepomex/sepomexdata.xls')"""
