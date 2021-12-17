@@ -1,9 +1,10 @@
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask.helpers import flash
 import flask_login
-
+# import linked_list
+import requests
 from sepomex.__init__ import app, db
-from sepomex.models import User
+from sepomex.models import User, States, Records
 from sepomex.forms import RegisterForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
 from sepomex.json_read import states, load_json
@@ -23,17 +24,51 @@ def api_welcome():
         
         return jsonify({'message':'Bienvenido a la API'})
 
-@app.route('/api/sepomex/<state>', methods=['GET'])
+@app.route('/api/sepomex/one/<id>', methods=['GET'])
 @login_required
-def get_info(state: str):
+def get_one_state(id: int):
+    # Consultas a la base de datos
+    state = States.query.get_or_404(id)
+    return {'name': state.name, 'data': state.data}
 
-        # Extraer información desde el DataFrame de pandas
-        response = data[state].to_json()
-        response
-        # Para leer información desde los archivos json que fueron extraido por script
-        # path = f'sepomex/json/{state}.json'
-        # response = load_json(path)
-        return response
+
+    # Con librerias
+    # state = States.query.all()
+    # all_states_ll = linked_list.LinkedList()
+
+    # for place in states:
+    #     all_states_ll.insert_beginning(
+    #         {
+    #             "id": place.id,
+    #             "name": place.name,
+    #             "records": place.data
+    #         }
+    #     )
+    
+    # response = all_states_ll.get_user_by_id(state_name)
+    # return jsonify(response), 200
+
+    # Extraer información desde el DataFrame de pandas
+    # response = data[state].to_json()
+    # response
+    # Para leer información desde los archivos json que fueron extraido por script
+    # path = f'sepomex/json/{state}.json'
+    # response = load_json(path)
+    # return response
+
+@app.route('/api/add/record', methods=['POST'])
+@login_required
+def add_record():
+    record = Records(
+        codigo_postal = request.json['codigo_postal'],
+        asentamiento = request.json['asentamiento'],
+        tipo = request.json['tipo'],
+        state = request.json['estado']
+    )   
+    db.session.add(record)
+    db.session.commit()
+    return {'id', record.id}, 200
+
 
 # Rutas de usuarios
 
