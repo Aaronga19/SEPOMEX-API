@@ -1,4 +1,5 @@
 from sepomex.__init__ import db, bcrypt, login_manager
+
 from flask_login import UserMixin
 
 @login_manager.user_loader
@@ -27,25 +28,23 @@ class User(db.Model, UserMixin):
         return f'Item: {self.username}'
 
 
-class State(db.Model):
-    __tablename__ = 'Estados'
+class States(db.Model):
+    "Tabla para entidades de la república"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(length=30), nullable=False, unique=True)
-    values = db.relationship('Info', backref="estado_info", lazy=True)
-
-    def __repr__(self):
-        return f'Estado: {self.name}'
+    name = db.Column(db.String(length=50), nullable=False, unique=True)
+    data = db.relationship('Records', backref="state", lazy=True)
 
 
-class Info(db.Model):
-    __tablename__ = 'Informacion'
+class Records(db.Model):
+    "Tabla de registros de cada una de los lugares de cada estado"
     __table_args__ = {'extend_existing': True}
-    codigo_postal = db.Column(db.String(length=5), nullable=False, unique=False)
-    asentamiento = db.Column(db.String(length=30), nullable=False, unique=True, primary_key=True)
-    tipo = db.Column(db.String(length=10), nullable=False, unique=False)
-    estado = db.Column(db.Integer(), db.ForeignKey('Estados.id'))
+    id = db.Column(db.Integer(), primary_key=True)
+    codigo_postal = db.Column(db.Integer(), nullable=False, unique=False)
+    asentamiento = db.Column(db.String(length=200), nullable=False, unique=False)
+    tipo = db.Column(db.String(length=50), nullable=True, unique=False)
+    estado_id = db.Column(db.Integer(), db.ForeignKey('states.id')) # Se relacionan los datos correspondientes a cada estado
+
     
     
-    def __repr__(self):
-        return f'Estado: {self.asentamiento}'
+

@@ -35,7 +35,7 @@ def get_info(state: str):
         # response = load_json(path)
         return response
 
-
+# Rutas de usuarios
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
