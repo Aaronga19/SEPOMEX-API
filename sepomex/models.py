@@ -7,6 +7,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class User(db.Model, UserMixin):
+    " Modelo de tabla de usuarios para acceder a la api"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(length=30), nullable=False, unique=True)
@@ -34,6 +35,9 @@ class States(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
     data = db.relationship('Records', backref="state", lazy=True)
+
+    def __repr__(self):
+        return f'Item: {self.name}'
 
 
 class Records(db.Model):
